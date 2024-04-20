@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('cpf')->unique();
             $table->rememberToken();
             $table->timestamps();
+            $table->decimal('balance', 10, 2)->default(0);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
