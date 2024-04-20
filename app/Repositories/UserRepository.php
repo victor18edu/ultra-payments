@@ -4,10 +4,10 @@ namespace App\Repositories;
 
 use App\Models\User;
 
-class UserRepository
+class UserRepository extends BaseRepository
 {
-    public function store(array $data)
+    public function __construct(User $model)
     {
-        return User::create($data);
+        parent::__construct($model);
     }
 }
