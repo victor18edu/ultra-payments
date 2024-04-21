@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import baseApi from '../../baseApi'; // Importe a instância Axios
+import Layout from '../Layout';
 
 const TransferPage = () => {
   // Defina os estados para os campos do formulário
@@ -27,6 +28,7 @@ const TransferPage = () => {
 
   return (
     <div>
+    <Layout>
       <h2>Transferência de Dinheiro</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -55,6 +57,8 @@ const TransferPage = () => {
           <p>{authorizationCode}</p>
         </div>
       )}
+
+      </Layout>
     </div>
   );
 };

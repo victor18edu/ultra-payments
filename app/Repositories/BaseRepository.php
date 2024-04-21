@@ -10,7 +10,7 @@ class BaseRepository
 
     public function __construct(Model $model)
     {
-        $this->setModel($model);
+        $this->model = $model;
     }
 
     public function create(array $data)
@@ -21,10 +21,5 @@ class BaseRepository
     public function find($id)
     {
         return $this->model->find($id);
-    }
-
-    public function setModel($model): void
-    {
-        $this->model = !is_null($model) ? $model : (new Model())->query();
     }
 }
