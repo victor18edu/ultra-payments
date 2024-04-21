@@ -66,6 +66,16 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+    frontend:
+        image: node:14
+        working_dir: /app/client
+        volumes:
+        - ./client:/app/client
+        command: npm start
+        ports:
+        - "3000:3000"
+        networks:
+        - sail
     meilisearch:
         image: 'getmeili/meilisearch:latest'
         ports:
