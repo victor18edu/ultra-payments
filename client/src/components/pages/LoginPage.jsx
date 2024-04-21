@@ -1,26 +1,26 @@
-// LoginPage.js
-
 import React, { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
-import { login } from '../services/authApi';
-import { Link } from 'react-router-dom';
+import { login } from '../services/Auth/authApi';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/Auth/AuthContext';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null); // Estado para armazenar mensagens de erro
+  const [error, setError] = useState(null);
+  const { setLogin } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(null); // Limpe o estado de erro antes de fazer o login
+    setError(null);
 
     try {
-      // Faça login usando as credenciais fornecidas
-      await login(email, password);
-      // Se o login for bem-sucedido, redirecione o usuário para a próxima página
-      // Você pode adicionar isso aqui dependendo do seu fluxo de navegação
+      const response = await login({ email, password });
+      const token = response;
+      setLogin(token);
+      navigate('/');
     } catch (error) {
-      // Se ocorrer um erro, atualize o estado de erro com a mensagem de erro
       setError(error.message);
     }
   };

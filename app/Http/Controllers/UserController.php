@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Users\CreateUserRequest;
 use App\Repositories\UserRepository;
+use App\Services\UserService;
 
 class UserController extends Controller
 {
-    public function store(CreateUserRequest $request, UserRepository $user_repository)
+    public function store(CreateUserRequest $request, UserService $userService)
     {
-        $data = $request->validated();
+        try {
+            $data = $request->validated();
+            $user = $userService->createUser($data);
 
-        $user_repository->store($data);
-
-        return response()->json(['message' => 'User created successfully'], 201);
+            return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create user', 'message' => $e->getMessage()], 500);
+        }
     }
 }

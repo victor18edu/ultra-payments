@@ -2,8 +2,8 @@ import { Navbar, Nav, Container, Row, Col } from 'react-bootstrap';
 import '../css/Menu.css';
 
 
-function Menu() {
-  return (
+const Layout = ({ children }) => {
+    return (
     <div style={{ height: '100vh' }}>
       <Navbar bg="dark" variant="dark">
         <Navbar.Brand href="#home" className="ms-5">Payment Links</Navbar.Brand>
@@ -20,7 +20,8 @@ function Menu() {
             </Nav>
           </Col>
 
-          <Col xs={10} style={{ height: '100%' }}>
+          <Col xs={10} style={{ height: '100%' }} className="p-5">
+            {children}
           </Col>
         </Row>
       </Container>
@@ -28,4 +29,4 @@ function Menu() {
   );
 }
 
-export default Menu;
+export default Layout;
