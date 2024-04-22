@@ -1,5 +1,4 @@
 import Layout from '../Layout';
-import Menu from '../Menu';
 
 function HomePage() {
   return (
