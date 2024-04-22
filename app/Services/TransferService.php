@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Repositories\TransactionRepository;
 use App\Notifications\TransactionNotification;
@@ -17,11 +18,35 @@ class TransferService
         $this->transactionRepository = $transactionRepository;
     }
 
-    public function transfer($senderId, $recipientId, $amount)
+    public function transfer(User $sender, $cpf, $amount)
     {
-        // Verificar se os usuários remetente e destinatário existem
-        $sender = $this->userRepository->find($senderId);
-        $recipient = $this->userRepository->find($recipientId);
+        $recipient = $this->userRepository->whereCpf($cpf);
+
+        $this->validation($sender, $recipient, $amount);
+        $authorizationCode = 'TRANSF' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+        $sender->balance -= $amount;
+        $recipient->balance += $amount;
+
+        $sender->save();
+        $recipient->save();
+
+        $this->transactionRepository->create([
+            'user_id' => $sender->id,
+            'related_user_id' => $recipient->id,
+            'type' => 'transfer',
+            'amount' => $amount,
+            'authorization_code' => $authorizationCode
+        ]);
+
+        $sender->notify(new TransactionNotification('Você realizou uma transferência de R$ ' . $amount));
+        $recipient->notify(new TransactionNotification('Você recebeu uma transferência de R$ ' . $amount));
+
+        return true;
+    }
+
+    public function validation ($sender, $recipient, $amount)
+    {
 
         if (!$sender || !$recipient) {
             throw new \Exception('Usuário remetente ou destinatário não encontrado');
@@ -36,26 +61,5 @@ class TransferService
         if ($sender->balance < $amount) {
             throw new \Exception('Saldo insuficiente para realizar a transferência');
         }
-
-        // Atualizar o saldo do remetente e do destinatário
-        $sender->balance -= $amount;
-        $recipient->balance += $amount;
-
-        $sender->save();
-        $recipient->save();
-
-        // Registrar a transação de transferência no histórico
-        $this->transactionRepository->create([
-            'user_id' => $senderId,
-            'related_user_id' => $recipientId,
-            'type' => 'transfer',
-            'amount' => $amount,
-        ]);
-
-        // Notificar o remetente e o destinatário sobre a transferência
-        $sender->notify(new TransactionNotification('Você realizou uma transferência de R$ ' . $amount));
-        $recipient->notify(new TransactionNotification('Você recebeu uma transferência de R$ ' . $amount));
-
-        return true;
     }
 }

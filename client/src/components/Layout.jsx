@@ -16,7 +16,6 @@ const Layout = ({ children }) => {
               <Nav.Link href="/" className="text-white border-bottom border-secondary py-3 ve-item-menu">Home</Nav.Link>
               <Nav.Link href="/deposit" className="text-white border-bottom border-secondary py-3 ve-item-menu">Depósitos</Nav.Link>
               <Nav.Link href="/transfer" className="text-white border-bottom border-secondary py-3 ve-item-menu">Transferências</Nav.Link>
-              <Nav.Link href="/login" className="text-white border-bottom border-secondary py-3 ve-item-menu">Logout</Nav.Link>
             </Nav>
           </Col>
 

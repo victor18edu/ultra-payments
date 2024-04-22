@@ -22,7 +22,7 @@ class TransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'recipient_id' => 'required|exists:users,id',
+            'recipient_cpf' => 'required|exists:users,cpf',
             'amount' => 'required|numeric|min:0',
         ];
     }

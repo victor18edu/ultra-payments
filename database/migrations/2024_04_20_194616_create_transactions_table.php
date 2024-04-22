@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('related_user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->decimal('amount', 10, 2);
+            $table->string('authorization_code');
             $table->timestamps();
         });
     }

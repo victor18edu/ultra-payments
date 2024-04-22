@@ -1,66 +1,82 @@
-import React, { useState } from 'react';
-import baseApi from '../../baseApi'; // Importe a instância Axios
+import React, { useState, useEffect } from 'react';
 import Layout from '../Layout';
+import { Button, Table } from 'react-bootstrap';
+import CreateTransferModal from './transfer/components/CreateTransferModal';
+import { fetchTransfers } from '../services/transactions/transferFunctions';
+import { format } from 'date-fns';
 
 const TransferPage = () => {
-  // Defina os estados para os campos do formulário
-  const [amount, setAmount] = useState('');
-  const [recipient, setRecipient] = useState('');
-  const [authorizationCode, setAuthorizationCode] = useState('');
+    const [transfers, setTransfers] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  // Função para lidar com o envio do formulário
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
-    try {
-      // Envia uma solicitação POST para a API com os dados do formulário
-      const response = await baseApi.post('/transfer', {
-        amount,
-        recipient,
-      });
+    const handleShowCreateModal = () => setShowCreateModal(true);
+    const handleCloseCreateModal = () => setShowCreateModal(false);
 
-      // Atualiza o estado com o código de autorização retornado pela API
-      setAuthorizationCode(response.data.authorizationCode);
-    } catch (error) {
-      console.error('Erro ao transferir dinheiro:', error);
-    }
-  };
+    const updateTransfers = () => {
+        fetchTransfers()
+            .then(response => {
+                setTransfers(response);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar lista de transferências:', error);
+                setLoading(false);
+            });
+    };
 
-  return (
-    <div>
-    <Layout>
-      <h2>Transferência de Dinheiro</h2>
-      <form onSubmit={handleSubmit}>
+    useEffect(() => {
+        updateTransfers();
+    }, []);
+
+    return (
         <div>
-          <label htmlFor="amount">Valor:</label>
-          <input
-            type="text"
-            id="amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
+            <Layout>
+                <h1 className='pb-4'>Transferências</h1>
+                <Button  variant="primary" onClick={handleShowCreateModal}>
+                    Criar Transferência
+                </Button>
+                <CreateTransferModal
+                    show={showCreateModal}
+                    onHide={handleCloseCreateModal}
+                    onUpdateTransfers={updateTransfers}
+                />
+                {loading ? (
+                    <p>Carregando...</p>
+                ) : (
+                    <div className='text-center'>
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Código de Autorização</th>
+                                    <th>Valor</th>
+                                    <th>Data</th>
+                                    <th>Destinatário (CPF)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {transfers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="4">Nenhum dado encontrado</td>
+                                    </tr>
+                                ) : (
+                                    transfers.map((transfer, index) => (
+                                        <tr key={index}>
+                                            <td>{transfer.authorization_code}</td>
+                                            <td>{transfer.amount}</td>
+                                            <td>{format(new Date(transfer.created_at), 'dd/MM/yyyy HH:mm:ss')}</td>
+                                            <td>{transfer.related_user.cpf}</td> {/* Exibir o CPF do destinatário */}
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </Table>
+                    </div>
+                )}
+            </Layout>
         </div>
-        <div>
-          <label htmlFor="recipient">Destinatário:</label>
-          <input
-            type="text"
-            id="recipient"
-            value={recipient}
-            onChange={(e) => setRecipient(e.target.value)}
-          />
-        </div>
-        <button type="submit">Transferir</button>
-      </form>
-      {authorizationCode && (
-        <div>
-          <h3>Código de Autorização:</h3>
-          <p>{authorizationCode}</p>
-        </div>
-      )}
-
-      </Layout>
-    </div>
-  );
+    );
 };
 
 export default TransferPage;

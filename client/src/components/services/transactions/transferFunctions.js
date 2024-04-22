@@ -1,17 +1,17 @@
 import baseApi from '../../../baseApi';
 
-export const fetchDeposits = async () => {
+export const fetchTransfers = async () => {
   try {
-    const response = await baseApi.get('/deposits');
+    const response = await baseApi.get('/transfers');
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const createDeposit = async (depositData) => {
+export const createTransfer = async (depositData) => {
   try {
-    const response = await baseApi.post('/deposits', depositData);
+    const response = await baseApi.post('/transfer', depositData);
     return response.data;
   } catch (error) {
     throw error;

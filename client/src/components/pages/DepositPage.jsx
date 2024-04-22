@@ -3,8 +3,7 @@ import Layout from '../Layout';
 import { Button, Table } from 'react-bootstrap';
 import { fetchDeposits } from '../services/transactions/depositFunctions';
 import CreateDepositModal from './deposit/components/CreateDepositModal';
-
-
+import { format } from 'date-fns';
 
 const DepositPage = () => {
     const [deposits, setDeposits] = useState([]);
@@ -15,7 +14,7 @@ const DepositPage = () => {
     const handleShowCreateModal = () => setShowCreateModal(true);
     const handleCloseCreateModal = () => setShowCreateModal(false);
 
-    useEffect(() => {
+    const updateDeposits = () => {
         fetchDeposits()
             .then(response => {
                 setDeposits(response);
@@ -25,7 +24,12 @@ const DepositPage = () => {
                 console.error('Erro ao buscar lista de depósitos:', error);
                 setLoading(false);
             });
+    };
+
+    useEffect(() => {
+        updateDeposits();
     }, []);
+
     return (
         <div>
             <Layout>
@@ -33,7 +37,11 @@ const DepositPage = () => {
                 <Button  variant="primary" onClick={handleShowCreateModal}>
                     Criar Depósito
                 </Button>
-                <CreateDepositModal show={showCreateModal} onHide={handleCloseCreateModal} />
+                <CreateDepositModal
+                    show={showCreateModal}
+                    onHide={handleCloseCreateModal}
+                    onUpdateDeposits={updateDeposits} // Passa a função de atualização como prop
+                />
                 {loading ? (
                     <p>Carregando...</p>
                 ) : (
@@ -54,9 +62,9 @@ const DepositPage = () => {
                                 ) : (
                                     deposits.map((deposit, index) => (
                                         <tr key={index}>
-                                            <td>{index + 1}</td>
+                                            <td>{deposit.authorization_code}</td>
                                             <td>{deposit.amount}</td>
-                                            <td>{deposit.date}</td>
+                                            <td>{format(new Date(deposit.created_at), 'dd/MM/yyyy HH:mm:ss')}</td>
                                         </tr>
                                     ))
                                 )}

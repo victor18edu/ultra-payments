@@ -10,4 +10,9 @@ class UserRepository extends BaseRepository
     {
         parent::__construct($model ?? new User());
     }
+
+    public function whereCpf(string $cpf)
+    {
+        return User::where('cpf', $cpf)->first();
+    }
 }
